@@ -1,8 +1,8 @@
-# Creating a 200-trade simulation Excel with four sheets: Fixed Risk, Martingale (soft increase after loss), Anti-Martingale (increase after win), and Kelly Criterion.
+# Creating a 100-trade simulation Excel with four sheets: Fixed Risk, Martingale (soft increase after loss), Anti-Martingale (increase after win), and Summary.
 # Assumptions (explicit in the file as well):
 # - Starting capital: $10,000
 # - Base risk per trade: 1% of current capital
-# - Win probability: 40%
+# - Win probability: 45%
 # - Reward-to-risk on winners: 1.5:1 (i.e., a win returns +1.5 * risk_amount)
 # - Martingale: after a loss increase risk% by +1 percentage point (absolute), reset to base on win. If risk% exceeds 100% it is treated as all-in (capped at 100%).
 # - Anti-martingale: after a win increase risk% by +1 percentage point, reset to base on loss. Same all-in cap applies.
@@ -12,21 +12,9 @@
 import numpy as np
 import pandas as pd
 from pathlib import Path
-seed = 552
-np.random.seed(seed)
-
-# Parameters
-starting_capital = 10000.0
-n_trades = 100
-base_risk_pct = 0.01  # 1%
-win_prob = 0.45
-reward_factor = 1.5  # winners pay 1.5:1 relative to risk amount
-step_pct = 0.01  # 1 percentage point increments for martingale/anti-martingale
-
-# Generate outcomes (True = win, False = loss)
-outcomes = np.random.rand(n_trades) < win_prob
 
 def run_fixed(capital0, outcomes, base_risk_pct, reward_factor):
+    """Run fixed risk strategy simulation"""
     rows = []
     capital = capital0
     for i, win in enumerate(outcomes, start=1):
@@ -45,6 +33,7 @@ def run_fixed(capital0, outcomes, base_risk_pct, reward_factor):
     return pd.DataFrame(rows)
 
 def run_martingale(capital0, outcomes, base_risk_pct, reward_factor, step_pct):
+    """Run martingale strategy simulation"""
     rows = []
     capital = capital0
     risk_pct_abs = base_risk_pct  # absolute percentage (e.g., 0.01, 0.02, ...)
@@ -71,6 +60,7 @@ def run_martingale(capital0, outcomes, base_risk_pct, reward_factor, step_pct):
     return pd.DataFrame(rows)
 
 def run_anti_martingale(capital0, outcomes, base_risk_pct, reward_factor, step_pct):
+    """Run anti-martingale strategy simulation"""
     rows = []
     capital = capital0
     risk_pct_abs = base_risk_pct
@@ -145,32 +135,95 @@ def calculate_stats(df, starting_capital, strategy_name):
         "Worst Trade": f"${worst_trade:.2f}"
     }
 
-# Run simulations
-fixed_df = run_fixed(starting_capital, outcomes, base_risk_pct, reward_factor)
-martingale_df = run_martingale(starting_capital, outcomes, base_risk_pct, reward_factor, step_pct)
-anti_df = run_anti_martingale(starting_capital, outcomes, base_risk_pct, reward_factor, step_pct)
+def run_excel_simulation(seed=552, starting_capital=10000.0, n_trades=100, 
+                        base_risk_pct=0.01, win_prob=0.45, reward_factor=1.5, step_pct=0.01,
+                        save_excel=True, output_dir="./"):
+    """
+    Run a single trading simulation and optionally save to Excel.
+    
+    Args:
+        seed: Random seed for reproducibility
+        starting_capital: Starting capital amount
+        n_trades: Number of trades to simulate
+        base_risk_pct: Base risk percentage per trade
+        win_prob: Probability of winning a trade
+        reward_factor: Reward factor for winning trades
+        step_pct: Step percentage for martingale strategies
+        save_excel: Whether to save results to Excel file
+        output_dir: Directory to save Excel file
+    
+    Returns:
+        Dictionary containing all simulation results and DataFrames
+    """
+    print(f"=== EXCEL TRADING SIMULATION ===")
+    print(f"Seed: {seed}")
+    print(f"Starting Capital: ${starting_capital:,.2f}")
+    print(f"Number of Trades: {n_trades}")
+    print(f"Win Probability: {win_prob:.1%}")
+    print(f"Base Risk: {base_risk_pct:.1%}")
+    print(f"Reward Factor: {reward_factor}:1")
+    
+    # Set seed for reproducibility
+    np.random.seed(seed)
+    
+    # Generate outcomes (True = win, False = loss)
+    outcomes = np.random.rand(n_trades) < win_prob
+    
+    # Run simulations
+    print(f"\nRunning simulations...")
+    fixed_df = run_fixed(starting_capital, outcomes, base_risk_pct, reward_factor)
+    martingale_df = run_martingale(starting_capital, outcomes, base_risk_pct, reward_factor, step_pct)
+    anti_df = run_anti_martingale(starting_capital, outcomes, base_risk_pct, reward_factor, step_pct)
+    
+    # Calculate statistics for all strategies
+    stats_list = [
+        calculate_stats(fixed_df, starting_capital, "Fixed Risk (1%)"),
+        calculate_stats(martingale_df, starting_capital, "Martingale (Soft)"),
+        calculate_stats(anti_df, starting_capital, "Anti-Martingale"),
+    ]
+    summary_df = pd.DataFrame(stats_list)
+    
+    # Print summary
+    print(f"\n=== SIMULATION SUMMARY ===")
+    print(summary_df.to_string(index=False))
+    
+    # Save to Excel if requested
+    if save_excel:
+        output_path = Path(output_dir) / f"trading_simulation_{seed}.xlsx"
+        with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
+            summary_df.to_excel(writer, sheet_name="Summary", index=False)
+            fixed_df.to_excel(writer, sheet_name="Fixed_Risk_1pct", index=False)
+            martingale_df.to_excel(writer, sheet_name="Martingale_soft", index=False)
+            anti_df.to_excel(writer, sheet_name="Anti_Martingale", index=False)
+        
+        print(f"\nSaved Excel to: {output_path}")
+    
+    return {
+        'summary_df': summary_df,
+        'fixed_df': fixed_df,
+        'martingale_df': martingale_df,
+        'anti_df': anti_df,
+        'outcomes': outcomes,
+        'parameters': {
+            'seed': seed,
+            'starting_capital': starting_capital,
+            'n_trades': n_trades,
+            'base_risk_pct': base_risk_pct,
+            'win_prob': win_prob,
+            'reward_factor': reward_factor,
+            'step_pct': step_pct
+        }
+    }
 
-# Calculate statistics for all strategies
-stats_list = [
-    calculate_stats(fixed_df, starting_capital, "Fixed Risk (1%)"),
-    calculate_stats(martingale_df, starting_capital, "Martingale (Soft)"),
-    calculate_stats(anti_df, starting_capital, "Anti-Martingale"),
-]
-summary_df = pd.DataFrame(stats_list)
-
-# Save to Excel
-# use the seed to name the file
-out_path = Path(f"./trading_simulation_{seed}.xlsx")
-with pd.ExcelWriter(out_path, engine="openpyxl") as writer:
-    summary_df.to_excel(writer, sheet_name="Summary", index=False)
-    fixed_df.to_excel(writer, sheet_name="Fixed_Risk_1pct", index=False)
-    martingale_df.to_excel(writer, sheet_name="Martingale_soft", index=False)
-    anti_df.to_excel(writer, sheet_name="Anti_Martingale", index=False)
-
-print("Saved Excel to:", out_path)
-print("\n=== SIMULATION SUMMARY ===")
-print(summary_df.to_string(index=False))
-
-# Run the Excel simulation
 if __name__ == "__main__":
-    print("Excel simulation completed!")
+    # Run the Excel simulation with default parameters
+    results = run_excel_simulation(
+        seed=552,
+        starting_capital=10000.0,
+        n_trades=100,
+        base_risk_pct=0.01,
+        win_prob=0.45,
+        reward_factor=1.5,
+        step_pct=0.01,
+        save_excel=True
+    )

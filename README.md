@@ -1,57 +1,81 @@
-# Trading Simulation
+# Trading Simulation Scripts
 
-A Python-based trading simulation that compares three different risk management strategies:
-- **Fixed Risk**: Consistent 1% risk per trade
-- **Martingale**: Increases risk after losses (soft increase)
-- **Anti-Martingale**: Increases risk after wins
+This repository contains three Python scripts for trading strategy simulation and analysis.
 
-## Setup
+## Scripts Overview
 
-### 1. Create Virtual Environment
+### 1. `trade-simulation.py` 
+**Original Excel-based simulation**
+- Single seed simulation with fixed parameters
+- Generates Excel file with detailed trade-by-trade results
+- **Usage**: `python trade-simulation.py`
 
+### 2. `excel-simulation.py`
+**Enhanced Excel simulation with configurable parameters**
+- Configurable seed, capital, trades, risk parameters
+- Optional Excel output
+- Function-based design for reusability
+- **Usage**: `python excel-simulation.py`
+
+### 3. `multi-seed-simulation.py`
+**Multi-seed analysis to determine best performing strategy**
+- Tests multiple seeds (default: 50) with 100 trades each
+- Comprehensive statistical analysis and rankings
+- Identifies best performing strategy across various market conditions
+- **Usage**: `python multi-seed-simulation.py`
+
+## Quick Start
+
+### Run Excel Simulation
 ```bash
-virtualenv venv
-```
-
-### 2. Activate Virtual Environment
-
-```bash
-# On Linux/Mac
-source venv/bin/activate
-
-# On Windows
-venv\Scripts\activate
-```
-
-### 3. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-## Usage
-
-Run the simulation:
-
-```bash
+# Original simulation
 python trade-simulation.py
+
+# Enhanced simulation
+python excel-simulation.py
 ```
 
-This will generate an Excel file with three sheets comparing the different strategies over 200 trades.
+### Run Multi-Seed Analysis
+```bash
+python multi-seed-simulation.py
+```
+
+## Trading Strategies Tested
+
+1. **Fixed Risk (1%)** - Constant 1% risk per trade
+2. **Martingale (Soft)** - Increases risk after losses, resets after wins
+3. **Anti-Martingale** - Increases risk after wins, resets after losses
 
 ## Parameters
 
-- **Starting capital**: $10,000
-- **Base risk per trade**: 1% of current capital
-- **Win probability**: 40%
-- **Reward-to-risk ratio**: 2:1
-- **Number of trades**: 200
+- **Starting Capital**: $10,000
+- **Win Probability**: 45%
+- **Reward Factor**: 1.5:1 (winners pay 1.5x risk amount)
+- **Base Risk**: 1% per trade
+- **Step Size**: 1% increments for martingale strategies
 
-## Deactivate Virtual Environment
+## Output
 
-When you're done:
+### Excel Files
+- Detailed trade-by-trade results for each strategy
+- Summary statistics including max drawdown
+- Multiple sheets for easy analysis
+
+### Multi-Seed Analysis
+- Comprehensive statistics for each strategy
+- Multiple ranking criteria (average return, median return, positive rate, risk-adjusted)
+- Clear identification of best performing strategy
+- Progress indicators during execution
+
+## Requirements
+
+- Python 3.7+
+- numpy
+- pandas
+- openpyxl (for Excel output)
+
+## Installation
 
 ```bash
-deactivate
+pip install numpy pandas openpyxl
 ```
-
