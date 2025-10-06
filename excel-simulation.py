@@ -218,7 +218,7 @@ def run_excel_simulation(seed=552, starting_capital=10000.0, n_trades=100,
 if __name__ == "__main__":
     # Run the Excel simulation with default parameters
     results = run_excel_simulation(
-        seed=552,
+        seed=600,
         starting_capital=10000.0,
         n_trades=100,
         base_risk_pct=0.01,

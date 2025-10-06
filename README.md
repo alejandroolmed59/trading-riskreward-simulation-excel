@@ -4,20 +4,15 @@ This repository contains three Python scripts for trading strategy simulation an
 
 ## Scripts Overview
 
-### 1. `trade-simulation.py` 
-**Original Excel-based simulation**
-- Single seed simulation with fixed parameters
-- Generates Excel file with detailed trade-by-trade results
-- **Usage**: `python trade-simulation.py`
 
-### 2. `excel-simulation.py`
+### 1. `excel-simulation.py`
 **Enhanced Excel simulation with configurable parameters**
 - Configurable seed, capital, trades, risk parameters
 - Optional Excel output
 - Function-based design for reusability
 - **Usage**: `python excel-simulation.py`
 
-### 3. `multi-seed-simulation.py`
+### 2. `multi-seed-simulation.py`
 **Multi-seed analysis to determine best performing strategy**
 - Tests multiple seeds (default: 50) with 100 trades each
 - Comprehensive statistical analysis and rankings
@@ -28,8 +23,6 @@ This repository contains three Python scripts for trading strategy simulation an
 
 ### Run Excel Simulation
 ```bash
-# Original simulation
-python trade-simulation.py
 
 # Enhanced simulation
 python excel-simulation.py
