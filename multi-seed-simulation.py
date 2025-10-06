@@ -364,22 +364,6 @@ def analyze_strategy_performance(all_results):
             ratio_color = Colors.GREEN if ratio > 1 else Colors.YELLOW if ratio > 0 else Colors.RED
             print(f"{medal_color}{medal} {strategy}: {ratio_color}{ratio:.2f}{Colors.ENDC}")
     
-    # Overall best strategy recommendation
-    print(f"\n{Colors.HEADER}{Colors.BOLD}=== OVERALL RECOMMENDATION ==={Colors.ENDC}")
-    best_strategy = avg_return_ranking[0][0]
-    best_stats = avg_return_ranking[0][1]
-    
-    print(f"{Colors.YELLOW}{Colors.BOLD}🏆 BEST PERFORMING STRATEGY: {best_strategy}{Colors.ENDC}")
-    
-    # Color code the stats
-    return_color = Colors.GREEN if best_stats['avg_return'] > 0 else Colors.RED
-    positive_rate_color = Colors.GREEN if best_stats['positive_rate'] > 50 else Colors.YELLOW if best_stats['positive_rate'] > 30 else Colors.RED
-    
-    print(f"{Colors.WHITE}   • Average Return:{Colors.ENDC} {return_color}{best_stats['avg_return']:.2f}%{Colors.ENDC}")
-    print(f"{Colors.WHITE}   • Positive Return Rate:{Colors.ENDC} {positive_rate_color}{best_stats['positive_rate']:.1f}%{Colors.ENDC}")
-    print(f"{Colors.WHITE}   • Average Final Capital:{Colors.ENDC} {Colors.GREEN}${best_stats['avg_final_capital']:,.2f}{Colors.ENDC}")
-    print(f"{Colors.WHITE}   • Average Max Drawdown:{Colors.ENDC} {Colors.RED}{best_stats['avg_drawdown']:.2f}%{Colors.ENDC}")
-    
     return {
         'strategy_summary': strategy_summary,
         'rankings': {
@@ -387,9 +371,7 @@ def analyze_strategy_performance(all_results):
             'median_return': median_return_ranking,
             'positive_rate': positive_rate_ranking,
             'risk_adjusted': risk_adjusted_ranking
-        },
-        'best_strategy': best_strategy,
-        'best_stats': best_stats
+        }
     }
 
 def run_custom_simulation(num_seeds=50, seedOffset=0, n_trades=100, starting_capital=10000.0, 
@@ -424,8 +406,8 @@ def run_custom_simulation(num_seeds=50, seedOffset=0, n_trades=100, starting_cap
 if __name__ == "__main__":
     # Run the multi-seed simulation with default parameters
     results = run_multi_seed_simulation(
-        num_seeds=50, 
-        seedOffset=100, 
+        num_seeds=100, 
+        seedOffset=250, 
         n_trades=100,
         starting_capital=10000.0,
         base_risk_pct=0.01,
