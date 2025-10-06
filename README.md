@@ -1,6 +1,6 @@
 # Trading Simulation Scripts
 
-This repository contains three Python scripts for trading strategy simulation and analysis.
+This repository contains two Python scripts for trading strategy simulation and analysis.
 
 ## Scripts Overview
 
