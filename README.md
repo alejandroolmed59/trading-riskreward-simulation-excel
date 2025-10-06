@@ -10,6 +10,7 @@ This repository contains two Python scripts for trading strategy simulation and 
 - Configurable seed, capital, trades, risk parameters
 - Optional Excel output
 - Function-based design for reusability
+- Colorful terminal output for better readability
 - **Usage**: `python excel-simulation.py`
 
 ### 2. `multi-seed-simulation.py`
@@ -17,6 +18,7 @@ This repository contains two Python scripts for trading strategy simulation and 
 - Tests multiple seeds (default: 50) with 100 trades each
 - Comprehensive statistical analysis and rankings
 - Identifies best performing strategy across various market conditions
+- Colorful terminal output with progress indicators and medal emojis (🥇🥈🥉)
 - **Usage**: `python multi-seed-simulation.py`
 
 ## Quick Start

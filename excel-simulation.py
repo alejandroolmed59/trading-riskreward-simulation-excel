@@ -13,6 +13,27 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 
+# ANSI color codes for terminal output
+class Colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    
+    # Custom colors
+    PURPLE = '\033[35m'
+    BLUE = '\033[34m'
+    YELLOW = '\033[33m'
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    CYAN = '\033[36m'
+    WHITE = '\033[37m'
+
 def run_fixed(capital0, outcomes, base_risk_pct, reward_factor):
     """Run fixed risk strategy simulation"""
     rows = []
@@ -155,13 +176,13 @@ def run_excel_simulation(seed=552, starting_capital=10000.0, n_trades=100,
     Returns:
         Dictionary containing all simulation results and DataFrames
     """
-    print(f"=== EXCEL TRADING SIMULATION ===")
-    print(f"Seed: {seed}")
-    print(f"Starting Capital: ${starting_capital:,.2f}")
-    print(f"Number of Trades: {n_trades}")
-    print(f"Win Probability: {win_prob:.1%}")
-    print(f"Base Risk: {base_risk_pct:.1%}")
-    print(f"Reward Factor: {reward_factor}:1")
+    print(f"{Colors.HEADER}{Colors.BOLD}=== EXCEL TRADING SIMULATION ==={Colors.ENDC}")
+    print(f"{Colors.OKCYAN}Seed:{Colors.ENDC} {Colors.WHITE}{seed}{Colors.ENDC}")
+    print(f"{Colors.OKCYAN}Starting Capital:{Colors.ENDC} {Colors.GREEN}${starting_capital:,.2f}{Colors.ENDC}")
+    print(f"{Colors.OKCYAN}Number of Trades:{Colors.ENDC} {Colors.WHITE}{n_trades}{Colors.ENDC}")
+    print(f"{Colors.OKCYAN}Win Probability:{Colors.ENDC} {Colors.YELLOW}{win_prob:.1%}{Colors.ENDC}")
+    print(f"{Colors.OKCYAN}Base Risk:{Colors.ENDC} {Colors.RED}{base_risk_pct:.1%}{Colors.ENDC}")
+    print(f"{Colors.OKCYAN}Reward Factor:{Colors.ENDC} {Colors.BLUE}{reward_factor}:1{Colors.ENDC}")
     
     # Set seed for reproducibility
     np.random.seed(seed)
@@ -170,7 +191,7 @@ def run_excel_simulation(seed=552, starting_capital=10000.0, n_trades=100,
     outcomes = np.random.rand(n_trades) < win_prob
     
     # Run simulations
-    print(f"\nRunning simulations...")
+    print(f"\n{Colors.OKBLUE}Running simulations...{Colors.ENDC}")
     fixed_df = run_fixed(starting_capital, outcomes, base_risk_pct, reward_factor)
     martingale_df = run_martingale(starting_capital, outcomes, base_risk_pct, reward_factor, step_pct)
     anti_df = run_anti_martingale(starting_capital, outcomes, base_risk_pct, reward_factor, step_pct)
@@ -184,7 +205,7 @@ def run_excel_simulation(seed=552, starting_capital=10000.0, n_trades=100,
     summary_df = pd.DataFrame(stats_list)
     
     # Print summary
-    print(f"\n=== SIMULATION SUMMARY ===")
+    print(f"\n{Colors.HEADER}{Colors.BOLD}=== SIMULATION SUMMARY ==={Colors.ENDC}")
     print(summary_df.to_string(index=False))
     
     # Save to Excel if requested
@@ -196,7 +217,7 @@ def run_excel_simulation(seed=552, starting_capital=10000.0, n_trades=100,
             martingale_df.to_excel(writer, sheet_name="Martingale_soft", index=False)
             anti_df.to_excel(writer, sheet_name="Anti_Martingale", index=False)
         
-        print(f"\nSaved Excel to: {output_path}")
+        print(f"\n{Colors.OKGREEN}Saved Excel to: {output_path}{Colors.ENDC}")
     
     return {
         'summary_df': summary_df,

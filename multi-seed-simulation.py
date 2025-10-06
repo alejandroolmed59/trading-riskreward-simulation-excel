@@ -11,6 +11,27 @@
 import numpy as np
 import pandas as pd
 
+# ANSI color codes for terminal output
+class Colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    
+    # Custom colors
+    PURPLE = '\033[35m'
+    BLUE = '\033[34m'
+    YELLOW = '\033[33m'
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    CYAN = '\033[36m'
+    WHITE = '\033[37m'
+
 def run_fixed(capital0, outcomes, base_risk_pct, reward_factor):
     """Run fixed risk strategy simulation"""
     rows = []
@@ -151,13 +172,13 @@ def run_multi_seed_simulation(num_seeds=50, seedOffset=0, n_trades=100, starting
     Returns:
         Dictionary containing aggregated results and best strategy analysis
     """
-    print(f"\n=== RUNNING MULTI-SEED SIMULATION ===")
-    print(f"Testing {num_seeds} different seeds with {n_trades} trades each")
-    print(f"Seed range: {seedOffset} to {seedOffset + num_seeds - 1}")
-    print(f"Starting capital: ${starting_capital:,.2f}")
-    print(f"Win probability: {win_prob:.1%}")
-    print(f"Base risk: {base_risk_pct:.1%}")
-    print(f"Reward factor: {reward_factor}:1")
+    print(f"\n{Colors.HEADER}{Colors.BOLD}=== RUNNING MULTI-SEED SIMULATION ==={Colors.ENDC}")
+    print(f"{Colors.OKCYAN}Testing {num_seeds} different seeds with {n_trades} trades each{Colors.ENDC}")
+    print(f"{Colors.OKCYAN}Seed range:{Colors.ENDC} {Colors.WHITE}{seedOffset} to {seedOffset + num_seeds - 1}{Colors.ENDC}")
+    print(f"{Colors.OKCYAN}Starting capital:{Colors.ENDC} {Colors.GREEN}${starting_capital:,.2f}{Colors.ENDC}")
+    print(f"{Colors.OKCYAN}Win probability:{Colors.ENDC} {Colors.YELLOW}{win_prob:.1%}{Colors.ENDC}")
+    print(f"{Colors.OKCYAN}Base risk:{Colors.ENDC} {Colors.RED}{base_risk_pct:.1%}{Colors.ENDC}")
+    print(f"{Colors.OKCYAN}Reward factor:{Colors.ENDC} {Colors.BLUE}{reward_factor}:1{Colors.ENDC}")
     
     # Store results for each strategy across all seeds
     all_results = {
@@ -210,7 +231,8 @@ def run_multi_seed_simulation(num_seeds=50, seedOffset=0, n_trades=100, starting
         
         # Progress indicator
         if (seed_idx + 1) % 10 == 0:
-            print(f"Completed {seed_idx + 1}/{num_seeds} simulations...")
+            progress_pct = ((seed_idx + 1) / num_seeds) * 100
+            print(f"{Colors.OKBLUE}Completed {seed_idx + 1}/{num_seeds} simulations... ({progress_pct:.0f}%){Colors.ENDC}")
     
     return analyze_strategy_performance(all_results)
 
@@ -224,7 +246,7 @@ def analyze_strategy_performance(all_results):
     Returns:
         Dictionary with performance analysis and rankings
     """
-    print(f"\n=== STRATEGY PERFORMANCE ANALYSIS ===")
+    print(f"\n{Colors.HEADER}{Colors.BOLD}=== STRATEGY PERFORMANCE ANALYSIS ==={Colors.ENDC}")
     
     strategy_summary = {}
     
@@ -275,37 +297,52 @@ def analyze_strategy_performance(all_results):
         }
         
         # Print summary for this strategy
-        print(f"\n--- {strategy_name} ---")
-        print(f"Average Return: {avg_return:.2f}%")
-        print(f"Median Return: {median_return:.2f}%")
-        print(f"Return Std Dev: {std_return:.2f}%")
-        print(f"Return Range: {min_return:.2f}% to {max_return:.2f}%")
-        print(f"Average Final Capital: ${avg_final_capital:,.2f}")
-        print(f"Average Max Drawdown: {avg_drawdown:.2f}%")
-        print(f"Worst Max Drawdown: {max_drawdown:.2f}%")
-        print(f"Positive Returns: {positive_rate:.1f}% ({positive_returns}/{len(results)})")
-        print(f"High Returns (>10%): {high_return_rate:.1f}% ({high_returns}/{len(results)})")
+        print(f"\n{Colors.OKCYAN}{Colors.BOLD}--- {strategy_name} ---{Colors.ENDC}")
+        
+        # Color code returns based on performance
+        avg_return_color = Colors.GREEN if avg_return > 0 else Colors.RED
+        median_return_color = Colors.GREEN if median_return > 0 else Colors.RED
+        positive_rate_color = Colors.GREEN if positive_rate > 50 else Colors.YELLOW if positive_rate > 30 else Colors.RED
+        
+        print(f"{Colors.WHITE}Average Return:{Colors.ENDC} {avg_return_color}{avg_return:.2f}%{Colors.ENDC}")
+        print(f"{Colors.WHITE}Median Return:{Colors.ENDC} {median_return_color}{median_return:.2f}%{Colors.ENDC}")
+        print(f"{Colors.WHITE}Return Std Dev:{Colors.ENDC} {Colors.YELLOW}{std_return:.2f}%{Colors.ENDC}")
+        print(f"{Colors.WHITE}Return Range:{Colors.ENDC} {Colors.RED}{min_return:.2f}%{Colors.ENDC} to {Colors.GREEN}{max_return:.2f}%{Colors.ENDC}")
+        print(f"{Colors.WHITE}Average Final Capital:{Colors.ENDC} {Colors.GREEN}${avg_final_capital:,.2f}{Colors.ENDC}")
+        print(f"{Colors.WHITE}Average Max Drawdown:{Colors.ENDC} {Colors.RED}{avg_drawdown:.2f}%{Colors.ENDC}")
+        print(f"{Colors.WHITE}Worst Max Drawdown:{Colors.ENDC} {Colors.RED}{max_drawdown:.2f}%{Colors.ENDC}")
+        print(f"{Colors.WHITE}Positive Returns:{Colors.ENDC} {positive_rate_color}{positive_rate:.1f}%{Colors.ENDC} ({positive_returns}/{len(results)})")
+        print(f"{Colors.WHITE}High Returns (>10%):{Colors.ENDC} {Colors.GREEN}{high_return_rate:.1f}%{Colors.ENDC} ({high_returns}/{len(results)})")
     
     # Determine best strategy based on multiple criteria
-    print(f"\n=== STRATEGY RANKINGS ===")
+    print(f"\n{Colors.HEADER}{Colors.BOLD}=== STRATEGY RANKINGS ==={Colors.ENDC}")
     
     # Create ranking based on average return
     avg_return_ranking = sorted(strategy_summary.items(), key=lambda x: x[1]['avg_return'], reverse=True)
-    print(f"\nRanking by Average Return:")
+    print(f"\n{Colors.OKCYAN}{Colors.BOLD}Ranking by Average Return:{Colors.ENDC}")
     for i, (strategy, stats) in enumerate(avg_return_ranking, 1):
-        print(f"{i}. {strategy}: {stats['avg_return']:.2f}%")
+        return_color = Colors.GREEN if stats['avg_return'] > 0 else Colors.RED
+        medal_color = Colors.YELLOW if i == 1 else Colors.WHITE if i == 2 else Colors.RED if i == 3 else Colors.WHITE
+        medal = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else f"{i}."
+        print(f"{medal_color}{medal} {strategy}: {return_color}{stats['avg_return']:.2f}%{Colors.ENDC}")
     
     # Create ranking based on median return (more robust to outliers)
     median_return_ranking = sorted(strategy_summary.items(), key=lambda x: x[1]['median_return'], reverse=True)
-    print(f"\nRanking by Median Return:")
+    print(f"\n{Colors.OKCYAN}{Colors.BOLD}Ranking by Median Return:{Colors.ENDC}")
     for i, (strategy, stats) in enumerate(median_return_ranking, 1):
-        print(f"{i}. {strategy}: {stats['median_return']:.2f}%")
+        return_color = Colors.GREEN if stats['median_return'] > 0 else Colors.RED
+        medal_color = Colors.YELLOW if i == 1 else Colors.WHITE if i == 2 else Colors.RED if i == 3 else Colors.WHITE
+        medal = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else f"{i}."
+        print(f"{medal_color}{medal} {strategy}: {return_color}{stats['median_return']:.2f}%{Colors.ENDC}")
     
     # Create ranking based on positive return rate
     positive_rate_ranking = sorted(strategy_summary.items(), key=lambda x: x[1]['positive_rate'], reverse=True)
-    print(f"\nRanking by Positive Return Rate:")
+    print(f"\n{Colors.OKCYAN}{Colors.BOLD}Ranking by Positive Return Rate:{Colors.ENDC}")
     for i, (strategy, stats) in enumerate(positive_rate_ranking, 1):
-        print(f"{i}. {strategy}: {stats['positive_rate']:.1f}%")
+        rate_color = Colors.GREEN if stats['positive_rate'] > 50 else Colors.YELLOW if stats['positive_rate'] > 30 else Colors.RED
+        medal_color = Colors.YELLOW if i == 1 else Colors.WHITE if i == 2 else Colors.RED if i == 3 else Colors.WHITE
+        medal = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else f"{i}."
+        print(f"{medal_color}{medal} {strategy}: {rate_color}{stats['positive_rate']:.1f}%{Colors.ENDC}")
     
     # Create ranking based on risk-adjusted return (return / drawdown)
     risk_adjusted_ranking = []
@@ -317,23 +354,31 @@ def analyze_strategy_performance(all_results):
         risk_adjusted_ranking.append((strategy, risk_adjusted_return))
     
     risk_adjusted_ranking.sort(key=lambda x: x[1], reverse=True)
-    print(f"\nRanking by Risk-Adjusted Return (Avg Return / Avg Drawdown):")
+    print(f"\n{Colors.OKCYAN}{Colors.BOLD}Ranking by Risk-Adjusted Return (Avg Return / Avg Drawdown):{Colors.ENDC}")
     for i, (strategy, ratio) in enumerate(risk_adjusted_ranking, 1):
+        medal_color = Colors.YELLOW if i == 1 else Colors.WHITE if i == 2 else Colors.RED if i == 3 else Colors.WHITE
+        medal = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else f"{i}."
         if ratio == float('inf'):
-            print(f"{i}. {strategy}: ∞ (no drawdown)")
+            print(f"{medal_color}{medal} {strategy}: {Colors.GREEN}∞ (no drawdown){Colors.ENDC}")
         else:
-            print(f"{i}. {strategy}: {ratio:.2f}")
+            ratio_color = Colors.GREEN if ratio > 1 else Colors.YELLOW if ratio > 0 else Colors.RED
+            print(f"{medal_color}{medal} {strategy}: {ratio_color}{ratio:.2f}{Colors.ENDC}")
     
     # Overall best strategy recommendation
-    print(f"\n=== OVERALL RECOMMENDATION ===")
+    print(f"\n{Colors.HEADER}{Colors.BOLD}=== OVERALL RECOMMENDATION ==={Colors.ENDC}")
     best_strategy = avg_return_ranking[0][0]
     best_stats = avg_return_ranking[0][1]
     
-    print(f"🏆 BEST PERFORMING STRATEGY: {best_strategy}")
-    print(f"   • Average Return: {best_stats['avg_return']:.2f}%")
-    print(f"   • Positive Return Rate: {best_stats['positive_rate']:.1f}%")
-    print(f"   • Average Final Capital: ${best_stats['avg_final_capital']:,.2f}")
-    print(f"   • Average Max Drawdown: {best_stats['avg_drawdown']:.2f}%")
+    print(f"{Colors.YELLOW}{Colors.BOLD}🏆 BEST PERFORMING STRATEGY: {best_strategy}{Colors.ENDC}")
+    
+    # Color code the stats
+    return_color = Colors.GREEN if best_stats['avg_return'] > 0 else Colors.RED
+    positive_rate_color = Colors.GREEN if best_stats['positive_rate'] > 50 else Colors.YELLOW if best_stats['positive_rate'] > 30 else Colors.RED
+    
+    print(f"{Colors.WHITE}   • Average Return:{Colors.ENDC} {return_color}{best_stats['avg_return']:.2f}%{Colors.ENDC}")
+    print(f"{Colors.WHITE}   • Positive Return Rate:{Colors.ENDC} {positive_rate_color}{best_stats['positive_rate']:.1f}%{Colors.ENDC}")
+    print(f"{Colors.WHITE}   • Average Final Capital:{Colors.ENDC} {Colors.GREEN}${best_stats['avg_final_capital']:,.2f}{Colors.ENDC}")
+    print(f"{Colors.WHITE}   • Average Max Drawdown:{Colors.ENDC} {Colors.RED}{best_stats['avg_drawdown']:.2f}%{Colors.ENDC}")
     
     return {
         'strategy_summary': strategy_summary,
@@ -380,7 +425,7 @@ if __name__ == "__main__":
     # Run the multi-seed simulation with default parameters
     results = run_multi_seed_simulation(
         num_seeds=50, 
-        seedOffset=0, 
+        seedOffset=100, 
         n_trades=100,
         starting_capital=10000.0,
         base_risk_pct=0.01,
@@ -389,7 +434,11 @@ if __name__ == "__main__":
         step_pct=0.01
     )
     
-    print(f"\n=== SIMULATION COMPLETED ===")
-    print(f"Best Strategy: {results['best_strategy']}")
-    print(f"Average Return: {results['best_stats']['avg_return']:.2f}%")
-    print(f"Positive Return Rate: {results['best_stats']['positive_rate']:.1f}%")
+    print(f"\n{Colors.OKGREEN}{Colors.BOLD}=== SIMULATION COMPLETED ==={Colors.ENDC}")
+    print(f"{Colors.WHITE}Best Strategy:{Colors.ENDC} {Colors.YELLOW}{Colors.BOLD}{results['best_strategy']}{Colors.ENDC}")
+    
+    return_color = Colors.GREEN if results['best_stats']['avg_return'] > 0 else Colors.RED
+    positive_rate_color = Colors.GREEN if results['best_stats']['positive_rate'] > 50 else Colors.YELLOW if results['best_stats']['positive_rate'] > 30 else Colors.RED
+    
+    print(f"{Colors.WHITE}Average Return:{Colors.ENDC} {return_color}{results['best_stats']['avg_return']:.2f}%{Colors.ENDC}")
+    print(f"{Colors.WHITE}Positive Return Rate:{Colors.ENDC} {positive_rate_color}{results['best_stats']['positive_rate']:.1f}%{Colors.ENDC}")
