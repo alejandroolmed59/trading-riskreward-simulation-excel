@@ -433,12 +433,3 @@ if __name__ == "__main__":
         reward_factor=1.5,
         step_pct=0.01
     )
-    
-    print(f"\n{Colors.OKGREEN}{Colors.BOLD}=== SIMULATION COMPLETED ==={Colors.ENDC}")
-    print(f"{Colors.WHITE}Best Strategy:{Colors.ENDC} {Colors.YELLOW}{Colors.BOLD}{results['best_strategy']}{Colors.ENDC}")
-    
-    return_color = Colors.GREEN if results['best_stats']['avg_return'] > 0 else Colors.RED
-    positive_rate_color = Colors.GREEN if results['best_stats']['positive_rate'] > 50 else Colors.YELLOW if results['best_stats']['positive_rate'] > 30 else Colors.RED
-    
-    print(f"{Colors.WHITE}Average Return:{Colors.ENDC} {return_color}{results['best_stats']['avg_return']:.2f}%{Colors.ENDC}")
-    print(f"{Colors.WHITE}Positive Return Rate:{Colors.ENDC} {positive_rate_color}{results['best_stats']['positive_rate']:.1f}%{Colors.ENDC}")
